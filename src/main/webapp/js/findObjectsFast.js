@@ -4,6 +4,7 @@ function FindObjectsFast() {
     var searchTerm = '';
     var storedSearchResult = [];
     var highlightedSearchResult = null;
+    var delayObject = {};
     searchTermInput.addEventListener('keyup', pressedSearchTermKey);
 
     this.setSearchUrl = function(newSearchUrl) {
@@ -61,10 +62,17 @@ function FindObjectsFast() {
         var searchTerm = $('fof_searchTerm').value;
         setSearchTerm(searchTerm);
         if(searchTerm.length >= 4) {
-            searchInBlackboard(searchTerm);
+            delay(function() { searchInBlackboard(searchTerm); }, delayObject, 400);
         } else {
             receiveSearchResults({userResultList: [], courseResultList: [], organizationResultList: []});
         }
+    }
+
+    function delay(func, delayObject, timeout) {
+        if(delayObject.timer) {
+            window.clearTimeout(delayObject.timer);
+        }
+        delayObject.timer = window.setTimeout(func, timeout);
     }
 
     function searchInBlackboard(searchTerm) {
