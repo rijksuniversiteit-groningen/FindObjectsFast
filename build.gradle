@@ -1,0 +1,179 @@
+apply plugin: "java"
+apply plugin: "war"
+apply plugin: "maven"
+
+sourceCompatibility = 1.7
+
+// define the version for the project when publishing to maven
+group "blackboard.plugin"
+version "1.0-SNAPSHOT"
+
+project.ext {
+	learnVersion = "9.1.201410.160373"
+	springVersion = "3.1.1.RELEASE"
+	hibernateVersion = "4.1.10.Final"
+}
+
+
+if (!project.hasProperty("learnVersion")) {
+	ext.learnVersion = "9.1.201410.160373"
+}
+if (!project.hasProperty('deployUsername')) {
+	ext.deployUsername = "administrator"
+}
+if (!project.hasProperty('deployPassword')) {
+	ext.deployPassword = "a"
+}
+if (!project.hasProperty('deployHostname')) {
+	ext.deployHostname = "localhost"
+}
+if (!project.hasProperty('deployPortNumber')) {
+	ext.deployPortNumber = "3280"
+}
+if (!project.hasProperty('deploySecretToken')) {
+	ext.deploySecretToken = ""
+}
+if (!project.hasProperty('deployHttps')) {
+	ext.deployHttps = "false"
+}
+
+buildscript {
+	repositories {
+		maven {
+			name "public"
+			url "https://nexus.cit.rug.nl/content/groups/public"
+		}
+	}
+	dependencies {
+		classpath("nl.rug.commons:rug-commons-bb:3.+") { transitive = false }
+		classpath("nl.rug.commons:rug-commons:3.+") { transitive = false }
+		classpath("nl.rug:rug-gradle:1.2-SNAPSHOT") { transitive = false }
+		classpath("commons-httpclient:commons-httpclient:3.1")
+		classpath("commons-dbcp:commons-dbcp:1.4")
+		classpath("commons-pool:commons-pool:1.6")
+		classpath("javax.servlet:javax.servlet-api:3.0.1")
+		classpath("javax.servlet.jsp:jsp-api:2.2")
+	}
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://maven.blackboard.com/content/repositories/releases/"
+    }
+    maven {
+        name "public"
+        url "${nexusBaseUrl}/groups/public"
+    }
+}
+
+configurations {
+	buildUtils
+}
+
+// define the project's dependencies
+dependencies {
+	compile("nl.rug.commons:rug-commons-bb:3.13.0") { transitive = false }
+	compile("nl.rug.commons:rug-commons:3.3.0") { transitive = false }
+
+	compile "com.intellij:annotations:12.0",
+			"com.google.code.findbugs:annotations:3.0.0",
+			"com.google.guava:guava:17.0"
+	compile "log4j:apache-log4j-extras:1.2.17"
+
+
+	providedCompile "javax.servlet:javax.servlet-api:3.0.1",
+			"javax.servlet.jsp:jsp-api:2.2",
+			"taglibs:standard:1.1.2"
+
+	// providedCompile dependencies are libraries needed to build, but should not be included in the B2 WAR.
+	providedCompile("blackboard.platform:bb-platform:${learnVersion}") { transitive = false }
+	providedCompile("blackboard.platform:bb-cms-admin:${learnVersion}") { transitive = false }
+	providedCompile("blackboard.platform:bb-taglibs:${learnVersion}") { transitive = false }
+	providedCompile("blackboard.platform:bb-bbxythos:${learnVersion}") { transitive = false }
+	providedCompile("blackboard.platform:xsscore:${learnVersion}") { transitive = false }
+
+	compile("blackboard.platform:bb-spring-webapi:10.5") { transitive = false }
+
+	compile "org.springframework:spring-aop:3.1.1.RELEASE",
+			"org.springframework:spring-asm:3.1.1.RELEASE",
+			"org.springframework:spring-beans:3.1.1.RELEASE",
+			"org.springframework:spring-context:3.1.1.RELEASE",
+			"org.springframework:spring-core:3.1.1.RELEASE",
+			"org.springframework:spring-expression:3.1.1.RELEASE",
+			"org.springframework:spring-web:3.1.1.RELEASE",
+			"org.springframework:spring-webmvc:3.1.1.RELEASE",
+			"org.springframework:spring-context-support:3.1.1.RELEASE",
+			"org.springframework:spring-jdbc:3.1.1.RELEASE",
+			"org.springframework:spring-orm:3.1.1.RELEASE",
+			"org.springframework:spring-tx:3.1.1.RELEASE"
+
+	compile("org.hibernate:hibernate-core:4.1.10.Final") { transitive = true }
+	compile "org.hibernate:hibernate-entitymanager:4.1.10.Final"
+
+	runtime "org.javassist:javassist:3.17.1-GA",
+			"dom4j:dom4j:1.6.1"
+
+	testCompile "junit:junit:4.12",
+			"commons-dbcp:commons-dbcp:1.4",
+			"commons-lang:commons-lang:2.4",
+			"net.sf.ehcache:ehcache:2.8.2",
+			"com.esotericsoftware.kryo:kryo:2.24.0",
+			"javax.mail:mail:1.4.7",
+			"com.newrelic.agent.java:newrelic-api:3.14.0",
+			"org.slf4j:slf4j-api:1.6.3",
+			"org.slf4j:slf4j-log4j12:1.6.3",
+			"org.postgresql:postgresql:9.2-1002-jdbc4",
+			"org.apache.tomcat:tomcat-jdbc:7.0.59",
+			"org.apache.lucene:lucene-core:2.9.4",
+			"org.apache.commons:commons-lang3:3.3.2",
+			"commons-collections:commons-collections:3.2.1",
+			"org.apache.velocity:velocity:1.7",
+			"xerces:xercesImpl:2.9.1",
+			"blackboard.private:oracle-jdbc:+",
+			"blackboard.private:xss:${learnVersion}",
+			"blackboard.platform:xsscore:${learnVersion}",
+			"blackboard.private:jlansrv:${learnVersion}",
+			"blackboard.platform:bb-bbxythos:${learnVersion}",
+			"blackboard.private:bb-exec:${learnVersion}",
+			"blackboard.private:bb-embedded:${learnVersion}"
+
+	buildUtils "org.oscelot:b2deploy-task:0.1.0"
+}
+test {
+	systemProperty "bbservices_config", "blackboard/config/service-config-unittest.properties"
+	include "**/*Suite*"
+    ignoreFailures true
+}
+
+
+getProperties().each { k, v ->
+	if (k.startsWith('junitProp.')) {
+		test.systemProperty "${k.split('\\.')[1]}", "${v}"
+	}
+}
+
+
+task parseBbManifest() {
+	def manifestFile = new File('src/main/webapp/WEB-INF/bb-manifest.xml')
+	if (manifestFile.exists()) {
+		def bbManifest = (new XmlParser()).parse(manifestFile)
+		version = bbManifest.plugin.version.@value[0]
+		def handle = bbManifest.plugin.handle.@value[0]
+		def vendor = bbManifest.plugin.vendor.id.@value[0]
+		war.baseName = vendor
+		war.appendix = handle
+		war.destinationDir = new File('build')
+	}
+}
+
+war.dependsOn parseBbManifest
+task deploy(type: nl.rug.gradle.UploadPluginTask, dependsOn: 'war') {
+	secretToken = "${deploySecretToken}"
+	username = "${deployUsername}"
+	password = "${deployPassword}"
+	warFile = war.archivePath
+	hostname = "${deployHostname}"
+	portNumber = "${deployPortNumber}"
+	useHttps = deployHttps.toBoolean()
+}

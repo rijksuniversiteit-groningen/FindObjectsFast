@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns="http://www.blackboard.com/bb-manifest-plugin"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.blackboard.com/bb-manifest-plugin http://fibbba.medu.com/xsd/bb-manifest-plugin.xsd">
+  <plugin>
+
+
+    <name value="Find Objects Fast" />
+    <handle value="FindObjectsFast" />
+    <description value="Find Objects Fast" />
+    <default-locale value="en_US" />
+
+    <version value="1.0" />
+    <requires>
+      <bbversion value="9.1.130000.0" />
+    </requires>
+
+    <vendor>
+      <id value="UG" />
+      <name value="University of Groningen" />
+      <url value="http://rug.nl/" />
+      <description value="University of Groningen" />
+    </vendor>
+
+    <module-defs>
+      <module-type ext-ref="ug/FindObjectsFast/FindObjectsFastModule"  title="Finds Objects Fast"
+                   uicreatable="true" >
+        <jsp>
+          <view>/viewModule</view>
+        </jsp>
+      </module-type>
+
+      <module type="ug/FindObjectsFast/FindObjectsFastModule"
+              title="Find Objects Fast"
+              useraddable="true"
+              isdetachable="true"
+              isdeletable="true"
+              isasync="false"
+              >
+        <description>Utility Module to find objects for System Administrators</description>>
+        <module-groups>
+          <module-group id="Everyone"/>
+        </module-groups>
+        <ExtraInfo/>
+      </module>
+
+    </module-defs>
+
+
+    <permissions>
+      <permission type="attribute" name="user.authinfo" actions="get,set"/>
+      <permission type="attribute" name="user.personalinfo" actions="get,set"/>
+
+      <permission type="persist" name="Group" actions="read, create, modify, delete"/>
+      <permission type="persist" name="OutcomeDefinition" actions="read, create, modify, delete"/>
+      <permission type="persist" name="OutcomeDefinitionCategory" actions="read, create, modify, delete"/>
+      <permission type="persist" name="Outcome" actions="read, create, modify, delete"/>
+      <permission type="persist" name="Attempt" actions="read, create, modify, delete"/>
+      <permission type="persist" name="CourseToc" actions="create"/>
+      <permission type="persist" name="Forum" actions="create, modify"/>
+      <permission type="persist" name="user" actions="create,modify,delete"/>
+      <permission type="persist" name="userrole" actions="create,modify,delete"/>
+      <permission type="persist" name="course" actions="create,modify,delete"/>
+
+      <!-- prevent permission errors in other building blocks which implement CxComponent -->
+      <permission type="persist" name="content" actions="modify"/>
+      <!-- prevent warnings when a building block starts (2014.10 problem) -->
+      <permission type="java.util.PropertyPermission"
+                  name="org.apache.juli.ClassLoaderLogManager.debug"
+                  action="read"/>
+
+      <!-- tab and layoutfamily permissions are required when dealing with groups -->
+      <permission type="persist" name="tab" actions="persist, read, create, modify, delete"/>
+      <permission type="persist" name="layoutfamily" actions="persist, read, create, modify, delete"/>
+
+      <!-- necessary for database access and usual connection stuff, also for sending e-mails! -->
+      <!-- listen permission is necessary for the Merlia SQL Server driver when used with named instances -->
+      <permission type="socket" name="*" actions="connect,listen,resolve"/>
+
+      <!-- necessary to install DupableSSLSocketFactory.TRUST_ALL_CERTIFICATES -->
+      <permission type="runtime" name="setFactory" actions=""/>
+
+      <!--
+        crude, but the only way to make sure the building block works when
+        the content directory is on a separate volume; you may try removing
+        this line and see if the block still works (check the logfiles!)
+        -->
+      <permission type="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write,delete"/>
+
+      <!-- necessary for nl.rug.lib.www.Log4jInitializationListener -->
+      <permission type="java.util.PropertyPermission" name="rug.log4j.outputdir" actions="write"/>
+      <permission type="java.io.FilePermission" name="../../../logs/tomcat/-" actions="write"/>
+      <permission type="java.util.logging.LoggingPermission" actions="control"/>
+
+      <!-- necessary for uploading files -->
+      <permission type="java.io.FilePermission" name="../../../content/vi/bb_bb60/sessions/-" actions="write,delete"/>
+      <permission type="java.io.FilePermission" name="../../../content/vi/BBLEARN/sessions/-" actions="write,delete"/>
+
+      <!-- also needed for uploading, and creating files in the content system in general -->
+      <!-- the delete permission is necessary for deleting groups (and maybe other operations as well) -->
+      <permission type="java.io.FilePermission" name="../../../content/vi/bb_bb60/recyclebin/-" actions="write,delete"/>
+      <permission type="java.io.FilePermission" name="../../../content/vi/BBLEARN/recyclebin/-" actions="write,delete"/>
+
+      <!-- necessary when using EHCache -->
+      <permission type="java.io.FilePermission" name="../../../apps/tomcat/temp/-" actions="write,delete"/>
+      <permission type="javax.management.MBeanPermission"
+                  name="net.sf.ehcache.management.CacheStatistics"
+                  actions="unregisterMBean,registerMBean"/>
+
+      <!-- necessary in 9.1 SP9 for EHcache to work -->
+      <!-- also necessary when using JAXB -->
+      <permission type="java.lang.reflect.ReflectPermission" name="suppressAccessChecks"/>
+
+      <!-- EHcache needs this to shutdown a cache -->
+      <permission type="runtime" name="modifyThread"/>
+
+      <!-- sometimes(?!) needed to initialize the database ConnectionPool -->
+      <!-- also needed when using Apache Axis (webservices) -->
+      <permission type="runtime" name="getClassLoader" actions=""/>
+
+    </permissions>
+
+  </plugin>
+</manifest>
