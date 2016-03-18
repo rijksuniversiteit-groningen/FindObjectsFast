@@ -1,0 +1,60 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  # the name used when adding the downloaded .box file
+  # ie vagrant box add --name 2015q4_test-target BOXFILE
+  config.vm.box = "2015q4_test-target"
+
+  #
+  config.vm.define "2015q4_test-target" do |t|
+  end
+
+  config.vm.synced_folder "shared/", "/vagrant"
+
+  # blackboard web interface http://localhost:3280
+  config.vm.network :forwarded_port, guest: 8080, host: 3380
+
+  # tomcat remote debugging
+  config.vm.network :forwarded_port, guest: 2222, host: 3305
+
+  # Postgresql database
+  # for running integration tests on the host it MUST be
+  # forwarded to port 5432; that means you cannot run a
+  # Postgresql database on your host, or run more than one
+  # Vagrant images for integration tests at the same time
+  config.vm.network :forwarded_port, guest: 5432, host: 5432
+
+  # ssh / scp
+  # this port forwarding allows
+  #  ssh -p 3222 vagrant@localhost
+  #  scp -P 3222 vagrant@localhost:
+  # once you have added your public key to /home/vagrant/.ssh/authorized_keys
+  config.vm.network :forwarded_port, guest: 22, host: 3322
+
+  # disable the default ssh forwarding to prevent conflicts on 2222
+  config.vm.network :forwarded_port, guest: 22, host: 2200, id: "ssh", disabled: "true"
+
+
+  config.vm.provider "virtualbox" do |v|
+    v.customize ["modifyvm", :id, "--name", "2015q4_test-target",
+                 "--memory", "4096", "--hwvirtex", "on",
+                 "--nestedpaging", "on", "--largepages", "on", "--vtxvpid", "on"]
+
+  end
+  config.vm.provision :shell, :inline => "chmod go+rx /home/vagrant"
+
+  # install useful linux tools like zip, screen. etc.
+  config.vm.provision :shell, :inline => "/vagrant/scripts/install-packages.sh"
+
+
+  config.vm.provision :shell, :inline => "ulimit -n 6000"
+
+  # make some usefull symlinks in home directories
+  config.vm.provision :shell, :privileged => false, :inline => "sudo -u vagrant /vagrant/scripts/conveniences.sh"
+  config.vm.provision :shell, :privileged => false, :inline => "sudo -u bbuser /vagrant/scripts/conveniences.sh"
+
+  # remove (for testing) useless building blocks, makes startup
+  # faster and saves a little memory
+  config.vm.provision :shell, :privileged => false, :inline => "sudo -u bbuser /vagrant/scripts/remove-b2s.sh"
+end
