@@ -8,33 +8,17 @@ sourceCompatibility = 1.7
 group "blackboard.plugin"
 version "1.0-SNAPSHOT"
 
-project.ext {
-	learnVersion = "9.1.201410.160373"
-	springVersion = "3.1.1.RELEASE"
-	hibernateVersion = "4.1.10.Final"
-}
 
-
+//Set defaults if gradle.properties file was not present
+//To override copy gradle.properties.template to gradle.properties
 if (!project.hasProperty("learnVersion")) {
 	ext.learnVersion = "9.1.201410.160373"
 }
-if (!project.hasProperty('deployUsername')) {
-	ext.deployUsername = "administrator"
+if (!project.hasProperty('deployServer')) {
+	ext.deployServer = "localhost:8081"
 }
-if (!project.hasProperty('deployPassword')) {
-	ext.deployPassword = "a"
-}
-if (!project.hasProperty('deployHostname')) {
-	ext.deployHostname = "localhost"
-}
-if (!project.hasProperty('deployPortNumber')) {
-	ext.deployPortNumber = "3280"
-}
-if (!project.hasProperty('deploySecretToken')) {
-	ext.deploySecretToken = ""
-}
-if (!project.hasProperty('deployHttps')) {
-	ext.deployHttps = "false"
+if (!project.hasProperty('deployInstance')) {
+	ext.deployInstance = "BBLEARN"
 }
 
 buildscript {
@@ -58,13 +42,9 @@ buildscript {
 
 repositories {
     mavenCentral()
-    maven {
-        url "https://maven.blackboard.com/content/repositories/releases/"
-    }
-    maven {
-        name "public"
-        url "${nexusBaseUrl}/groups/public"
-    }
+	maven {
+		url "https://maven.blackboard.com/content/repositories/releases/"
+	}
 }
 
 configurations {
@@ -73,18 +53,9 @@ configurations {
 
 // define the project's dependencies
 dependencies {
-	compile("nl.rug.commons:rug-commons-bb:3.13.0") { transitive = false }
-	compile("nl.rug.commons:rug-commons:3.3.0") { transitive = false }
-
 	compile "com.intellij:annotations:12.0",
 			"com.google.code.findbugs:annotations:3.0.0",
-			"com.google.guava:guava:17.0"
-	compile "log4j:apache-log4j-extras:1.2.17"
-
-
-	providedCompile "javax.servlet:javax.servlet-api:3.0.1",
-			"javax.servlet.jsp:jsp-api:2.2",
-			"taglibs:standard:1.1.2"
+		    "log4j:apache-log4j-extras:1.2.17"
 
 	// providedCompile dependencies are libraries needed to build, but should not be included in the B2 WAR.
 	providedCompile("blackboard.platform:bb-platform:${learnVersion}") { transitive = false }
@@ -92,6 +63,10 @@ dependencies {
 	providedCompile("blackboard.platform:bb-taglibs:${learnVersion}") { transitive = false }
 	providedCompile("blackboard.platform:bb-bbxythos:${learnVersion}") { transitive = false }
 	providedCompile("blackboard.platform:xsscore:${learnVersion}") { transitive = false }
+	providedCompile "javax.servlet:javax.servlet-api:3.0.1",
+			"javax.servlet.jsp:jsp-api:2.2",
+			"taglibs:standard:1.1.2",
+			"com.google.guava:guava:17.0"
 
 	compile("blackboard.platform:bb-spring-webapi:10.5") { transitive = false }
 
@@ -108,11 +83,6 @@ dependencies {
 			"org.springframework:spring-orm:3.1.1.RELEASE",
 			"org.springframework:spring-tx:3.1.1.RELEASE"
 
-	compile("org.hibernate:hibernate-core:4.1.10.Final") { transitive = true }
-	compile "org.hibernate:hibernate-entitymanager:4.1.10.Final"
-
-	runtime "org.javassist:javassist:3.17.1-GA",
-			"dom4j:dom4j:1.6.1"
 
 	testCompile "junit:junit:4.12",
 			"commons-dbcp:commons-dbcp:1.4",
@@ -168,12 +138,23 @@ task parseBbManifest() {
 }
 
 war.dependsOn parseBbManifest
-task deploy(type: nl.rug.gradle.UploadPluginTask, dependsOn: 'war') {
-	secretToken = "${deploySecretToken}"
-	username = "${deployUsername}"
-	password = "${deployPassword}"
-	warFile = war.archivePath
-	hostname = "${deployHostname}"
-	portNumber = "${deployPortNumber}"
-	useHttps = deployHttps.toBoolean()
+
+configurations {
+	buildUtils
 }
+
+// Add a task to deploy a B2 using starting block
+task deployB2( dependsOn: "war" ) << {
+	ant.taskdef( name: "b2deploy", classname: "org.oscelot.ant.B2DeployTask", classpath: project.configurations.buildUtils.asPath )
+	ant.b2deploy(
+			localfilepath: project.war.archivePath,
+			host: project.ext.deployServer,
+			courseorgavailable: 'true',
+			clean: 'true',
+			webappName: '/bb-starting-block-' + project.ext.deployInstance )
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '1.6'
+}
+
