@@ -15,7 +15,7 @@ if (!project.hasProperty("learnVersion")) {
 	ext.learnVersion = "9.1.201410.160373"
 }
 if (!project.hasProperty('deployServer')) {
-	ext.deployServer = "localhost:8081"
+	ext.deployServer = "localhost:3380"
 }
 if (!project.hasProperty('deployInstance')) {
 	ext.deployInstance = "BBLEARN"
