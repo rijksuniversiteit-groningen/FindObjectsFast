@@ -37,7 +37,7 @@
               isdeletable="true"
               isasync="false"
               >
-        <description>Utility Module to find objects for System Administrators</description>>
+        <description>Utility Module to find objects for System Administrators</description>
         <module-groups>
           <module-group id="Everyone"/>
         </module-groups>
