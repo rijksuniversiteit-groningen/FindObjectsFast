@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.synced_folder "shared/", "/vagrant"
 
-  # blackboard web interface http://localhost:3280
+  # blackboard web interface http://localhost:3380
   config.vm.network :forwarded_port, guest: 8080, host: 3380
 
   # tomcat remote debugging
@@ -27,8 +27,8 @@ Vagrant.configure("2") do |config|
 
   # ssh / scp
   # this port forwarding allows
-  #  ssh -p 3222 vagrant@localhost
-  #  scp -P 3222 vagrant@localhost:
+  #  ssh -p 3322 vagrant@localhost
+  #  scp -P 3322 vagrant@localhost:
   # once you have added your public key to /home/vagrant/.ssh/authorized_keys
   config.vm.network :forwarded_port, guest: 22, host: 3322
 
