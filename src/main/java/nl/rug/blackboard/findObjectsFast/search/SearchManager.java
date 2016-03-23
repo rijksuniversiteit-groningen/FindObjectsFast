@@ -18,19 +18,21 @@ import java.util.List;
 import static com.google.common.base.Predicates.not;
 
 public class SearchManager {
+    private final CourseResultConverter toCourseResult = new CourseResultConverter();
+    private final UserResultConverter toUserResult = new UserResultConverter();
+    private final Predicate<CourseResult> isCourse = new IsCoursePredicate();
 
     public SearchResult search(String searchTerm) {
         try {
-            SearchResult result = new SearchResult();
-            List<Course> allCourses = searchCourses(searchTerm);
-            Predicate<Course> isCourse = new IsCoursePredicate();
-            CourseResultConverter toCourseResult = new CourseResultConverter();
-            result.setCourseResultList(
-                    FluentIterable.from(allCourses).filter(isCourse).transform(toCourseResult).toList());
-            result.setOrganizationResultList(
-                    FluentIterable.from(allCourses).filter(not(isCourse)).transform(toCourseResult).toList());
+            FluentIterable<CourseResult> allCourses =
+                    FluentIterable.from(searchCourses(searchTerm))
+                    .transform(toCourseResult);
 
+            SearchResult result = new SearchResult();
+            result.setCourseResultList(allCourses.filter(isCourse).toList());
+            result.setOrganizationResultList(allCourses.filter(not(isCourse)).toList());
             result.setUserResultList(searchUsers(searchTerm));
+
             return result;
         } catch (PersistenceException e) {
             throw new PersistenceRuntimeException(e);
@@ -44,13 +46,13 @@ public class SearchManager {
     private List<UserResult> searchUsers(String searchTerm) throws PersistenceException {
         UserSearch search = new UserSearchEx(searchTerm);
         List<User> userList = UserDbLoader.Default.getInstance().loadByUserSearch(search);
-        return Lists.transform(userList, new UserResultConverter());
+        return Lists.transform(userList, toUserResult);
     }
 
-    private class IsCoursePredicate implements Predicate<Course> {
+    private class IsCoursePredicate implements Predicate<CourseResult> {
         @Override
-        public boolean apply(Course course) {
-            return course.getServiceLevelType() == Course.ServiceLevel.FULL;
+        public boolean apply(CourseResult course) {
+            return course.isCourse();
         }
     }
 
