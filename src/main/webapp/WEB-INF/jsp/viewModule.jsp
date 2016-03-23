@@ -10,14 +10,12 @@
 <ng:cssFile href="${contextPath}/css/findObjectsFast.css"/>
 
 <ng:includedPage ctxId="ctx">
-    <form>
-        <input type="text"
-               name="searchTerm"
-               id="fof_searchTerm"
-               autocomplete="off"
-               placeholder="Type to search users, courses and organizations"
-        />
-    </form>
+    <input type="text"
+           name="searchTerm"
+           id="fof_searchTerm"
+           autocomplete="off"
+           placeholder="Type to search users, courses and organizations"
+    />
 
     <div id="fof_searchResults"></div>
 
