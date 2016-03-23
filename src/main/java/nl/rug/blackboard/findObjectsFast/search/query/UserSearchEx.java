@@ -2,13 +2,14 @@ package nl.rug.blackboard.findObjectsFast.search.query;
 
 import blackboard.data.role.RoleUtil;
 import blackboard.persist.Id;
+import blackboard.persist.SearchOperator;
 import blackboard.persist.user.UserSearch;
 import blackboard.platform.context.Context;
 import blackboard.platform.context.ContextManagerFactory;
 
 public class UserSearchEx extends UserSearch {
 
-    public UserSearchEx() {
+    public UserSearchEx(String searchTerm) {
         Context ctx = ContextManagerFactory.getInstance().getContext();
         this._query = new UserSearchEx.UserSearchQueryEx(ctx.getUserId());
         this._query.setUsePaging(true);
@@ -17,6 +18,11 @@ public class UserSearchEx extends UserSearch {
         if(Id.isValid(ctx.getUserId())) {
             this.setAdminSearching(RoleUtil.isUserSystemAdmin(ctx.getUser()));
         }
+
+        addParameter(new UserSearch.SearchParameter(UserSearch.SearchKey.GivenName, searchTerm, SearchOperator.Contains));
+        addParameter(new UserSearch.SearchParameter(UserSearch.SearchKey.FamilyName, searchTerm, SearchOperator.Contains));
+        addParameter(new UserSearch.SearchParameter(UserSearch.SearchKey.Email, searchTerm, SearchOperator.Contains));
+        addParameter(new UserSearch.SearchParameter(UserSearch.SearchKey.UserName, searchTerm, SearchOperator.Contains));
     }
 
     public class UserSearchQueryEx extends UserSearchQuery {

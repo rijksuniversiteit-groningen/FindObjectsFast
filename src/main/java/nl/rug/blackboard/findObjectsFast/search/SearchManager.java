@@ -4,7 +4,6 @@ import blackboard.data.course.Course;
 import blackboard.data.user.User;
 import blackboard.persist.PersistenceException;
 import blackboard.persist.PersistenceRuntimeException;
-import blackboard.persist.SearchOperator;
 import blackboard.persist.course.CourseDbLoader;
 import blackboard.persist.user.UserDbLoader;
 import blackboard.persist.user.UserSearch;
@@ -43,12 +42,7 @@ public class SearchManager {
     }
 
     private List<UserResult> searchUsers(String searchTerm) throws PersistenceException {
-        UserSearch search = new UserSearchEx();
-        search.addParameter(new UserSearch.SearchParameter(UserSearch.SearchKey.GivenName, searchTerm, SearchOperator.Contains));
-        search.addParameter(new UserSearch.SearchParameter(UserSearch.SearchKey.FamilyName, searchTerm, SearchOperator.Contains));
-        search.addParameter(new UserSearch.SearchParameter(UserSearch.SearchKey.Email, searchTerm, SearchOperator.Contains));
-        search.addParameter(new UserSearch.SearchParameter(UserSearch.SearchKey.UserName, searchTerm, SearchOperator.Contains));
-
+        UserSearch search = new UserSearchEx(searchTerm);
         List<User> userList = UserDbLoader.Default.getInstance().loadByUserSearch(search);
         return Lists.transform(userList, new UserResultConverter());
     }
