@@ -2,14 +2,14 @@ package nl.rug.blackboard.findObjectsFast.search;
 
 import blackboard.data.course.Course;
 import blackboard.platform.integration.exchange.CourseXO;
+import com.google.common.base.Function;
 
 
 /**
  * @author <a href="p.r.fokkinga [at] rug.nl">Peter Fokkinga</a>
  */
-public class CourseResultConverter {
-
-	public static CourseResult convert(Course course) {
+public class CourseResultConverter implements Function<Course, CourseResult> {
+	public CourseResult apply(Course course) {
 		CourseResult result = new CourseResult();
 		result.setCode(course.getCourseId());
 		result.setTitle(course.getTitle());
@@ -19,7 +19,7 @@ public class CourseResultConverter {
 		return result;
 	}
 
-	private static String getCourseLaunchUrl(Course course) {
+	private String getCourseLaunchUrl(Course course) {
 		CourseXO courseXO = new CourseXO(course);
 		return courseXO.getLaunchUrl();
 	}

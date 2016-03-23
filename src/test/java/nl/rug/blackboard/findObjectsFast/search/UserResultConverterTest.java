@@ -18,7 +18,8 @@ public class UserResultConverterTest {
 	@Category(IntegrationTest.class)
 	public void testEmptyUser() {
 		User u = new User();
-		UserResult result = UserResultConverter.convert(u);
+		UserResultConverter userResultConverter = new UserResultConverter();
+		UserResult result = userResultConverter.apply(u);
 		assertNotNull(result);
 	}
 
@@ -28,7 +29,9 @@ public class UserResultConverterTest {
 		User u = new User();
 		u.setFamilyName("Simpson");
 		u.setGivenName("Bart");
-		UserResult result = UserResultConverter.convert(u);
+		UserResultConverter userResultConverter = new UserResultConverter();
+		UserResult result = userResultConverter.apply(u);
+		assertNotNull(result);
 		assertEquals("Bart Simpson", result.getDisplayName());
 	}
 }

@@ -17,7 +17,8 @@ public class CourseResultConverterTest {
 	@Category(UnitTest.class)
 	public void testEmptyCourse() {
 		Course course = new Course();
-		CourseResult converted = CourseResultConverter.convert(course);
+		CourseResultConverter courseResultConverter = new CourseResultConverter();
+		CourseResult converted = courseResultConverter.apply(course);
 		assertNotNull(converted);
 		assertNotNull(converted.getTitle());
 	}
