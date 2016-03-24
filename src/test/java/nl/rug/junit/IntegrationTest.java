@@ -12,6 +12,6 @@ package nl.rug.junit;
  * </ul>
  * You must provide a system property <code>bbservices_config</code> with the
  * full path to a blackboard configuration file. For example
- * <code>../vagrant/2014.10/blackboard/config/unittest-service-config.properties</code>
+ * <code>./vagrant/blackboard/config/unittest-service-config.properties</code>
  */
 public interface IntegrationTest {}

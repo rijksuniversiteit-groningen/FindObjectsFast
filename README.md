@@ -25,6 +25,7 @@ Recommended: put your public ssh key in ./vagrant/shared/etc/authorized_keys
 In the 'vagrant' directory run `vagrant up` This can
 take a while (5+ minutes). When it's done, run:
 `vagrant snapshot save 2015q4_test-target clean-install`
+and `vagrant plugin install vagrant-scp` 
 
 
 ### Building
@@ -38,3 +39,6 @@ To deploy the B2 to your Learn server, run:
 gradlew deployB2
 
 
+### Preparing for integration tests
+The Vagrant image should be running. Change to directory ./vagrant/blackboard
+run `vagrant scp :/usr/local/blackboard/config .`
