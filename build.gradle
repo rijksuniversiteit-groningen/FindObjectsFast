@@ -12,7 +12,7 @@ version "1.0-SNAPSHOT"
 //Set defaults if gradle.properties file was not present
 //To override copy gradle.properties.template to gradle.properties
 if (!project.hasProperty("learnVersion")) {
-	ext.learnVersion = "9.1.201410.160373"
+	ext.learnVersion = "9.1.201510.1171621"
 }
 if (!project.hasProperty('deployServer')) {
 	ext.deployServer = "localhost:3380"
@@ -21,27 +21,9 @@ if (!project.hasProperty('deployInstance')) {
 	ext.deployInstance = "BBLEARN"
 }
 
-buildscript {
-	repositories {
-		maven {
-			name "public"
-			url "https://nexus.cit.rug.nl/content/groups/public"
-		}
-	}
-	dependencies {
-		classpath("nl.rug.commons:rug-commons-bb:3.+") { transitive = false }
-		classpath("nl.rug.commons:rug-commons:3.+") { transitive = false }
-		classpath("nl.rug:rug-gradle:1.2-SNAPSHOT") { transitive = false }
-		classpath("commons-httpclient:commons-httpclient:3.1")
-		classpath("commons-dbcp:commons-dbcp:1.4")
-		classpath("commons-pool:commons-pool:1.6")
-		classpath("javax.servlet:javax.servlet-api:3.0.1")
-		classpath("javax.servlet.jsp:jsp-api:2.2")
-	}
-}
 
 repositories {
-    mavenCentral()
+	mavenCentral()
 	maven {
 		url "https://maven.blackboard.com/content/repositories/releases/"
 	}
@@ -74,14 +56,11 @@ dependencies {
 			"org.springframework:spring-asm:3.1.1.RELEASE",
 			"org.springframework:spring-beans:3.1.1.RELEASE",
 			"org.springframework:spring-context:3.1.1.RELEASE",
-			"org.springframework:spring-core:3.1.1.RELEASE",
 			"org.springframework:spring-expression:3.1.1.RELEASE",
 			"org.springframework:spring-web:3.1.1.RELEASE",
 			"org.springframework:spring-webmvc:3.1.1.RELEASE",
 			"org.springframework:spring-context-support:3.1.1.RELEASE",
-			"org.springframework:spring-jdbc:3.1.1.RELEASE",
-			"org.springframework:spring-orm:3.1.1.RELEASE",
-			"org.springframework:spring-tx:3.1.1.RELEASE"
+			"org.springframework:spring-core:3.1.1.RELEASE"
 
 
 	testCompile "junit:junit:4.12",
@@ -99,21 +78,25 @@ dependencies {
 			"org.apache.commons:commons-lang3:3.3.2",
 			"commons-collections:commons-collections:3.2.1",
 			"org.apache.velocity:velocity:1.7",
-			"xerces:xercesImpl:2.9.1",
-			"blackboard.private:oracle-jdbc:+",
-			"blackboard.private:xss:${learnVersion}",
-			"blackboard.platform:xsscore:${learnVersion}",
-			"blackboard.private:jlansrv:${learnVersion}",
-			"blackboard.platform:bb-bbxythos:${learnVersion}",
-			"blackboard.private:bb-exec:${learnVersion}",
-			"blackboard.private:bb-embedded:${learnVersion}"
+			"xerces:xercesImpl:2.9.1"
+			"blackboard.platform:xsscore:${learnVersion}"
+			"blackboard.platform:bb-bbxythos:${learnVersion}"
 
+	testCompile fileTree(dir: 'vagrant/blackboard/lib', include: ['*.jar'])
 	buildUtils "org.oscelot:b2deploy-task:0.1.0"
 }
+
+
 test {
-	systemProperty "bbservices_config", "blackboard/config/service-config-unittest.properties"
-	include "**/*Suite*"
-    ignoreFailures true
+	ignoreFailures true
+	systemProperty "bbservices_config", "vagrant/blackboard/config/service-config-unittest.properties"
+	useJUnit {
+		includeCategories 'nl.rug.junit.UnitTest'
+		excludeCategories 'nl.rug.junit.IntegrationTest'
+	}
+	reports {
+		html
+	}
 }
 
 
