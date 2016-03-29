@@ -47,7 +47,6 @@ Vagrant.configure("2") do |config|
   # install useful linux tools like zip, screen. etc.
   config.vm.provision :shell, :inline => "/vagrant/scripts/install-packages.sh"
 
-
   config.vm.provision :shell, :inline => "ulimit -n 6000"
 
   # make some usefull symlinks in home directories
@@ -57,4 +56,7 @@ Vagrant.configure("2") do |config|
   # remove (for testing) useless building blocks, makes startup
   # faster and saves a little memory
   config.vm.provision :shell, :privileged => false, :inline => "sudo -u bbuser /vagrant/scripts/remove-b2s.sh"
+
+  # restore any course archive files from shared/courses
+  config.vm.provision :shell, :privileged => false, :inline => "sudo -u bbuser /vagrant/scripts/restore-courses.sh"
 end
