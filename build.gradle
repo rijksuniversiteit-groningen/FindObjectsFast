@@ -1,16 +1,15 @@
 apply plugin: "java"
+apply plugin: "idea"
 apply plugin: "war"
 apply plugin: "maven"
+apply plugin: "findbugs"
 
+// Learn upto (including) 2015.10 requires compilation with Java 7
 sourceCompatibility = 1.7
 
-// define the version for the project when publishing to maven
-group "blackboard.plugin"
-version "1.0-SNAPSHOT"
 
-
-//Set defaults if gradle.properties file was not present
-//To override copy gradle.properties.template to gradle.properties
+// Set defaults if gradle.properties file was not present
+// To override copy gradle.properties.template to gradle.properties
 if (!project.hasProperty("learnVersion")) {
 	ext.learnVersion = "9.1.201510.1171621"
 }
@@ -36,15 +35,10 @@ configurations {
 // define the project's dependencies
 dependencies {
 	compile "com.intellij:annotations:12.0",
-			"com.google.code.findbugs:annotations:3.0.0",
-		    "log4j:apache-log4j-extras:1.2.17"
+			"com.google.code.findbugs:annotations:3.0.0"
 
-	// providedCompile dependencies are libraries needed to build, but should not be included in the B2 WAR.
 	providedCompile("blackboard.platform:bb-platform:${learnVersion}") { transitive = false }
-	providedCompile("blackboard.platform:bb-cms-admin:${learnVersion}") { transitive = false }
-	providedCompile("blackboard.platform:bb-taglibs:${learnVersion}") { transitive = false }
-	providedCompile("blackboard.platform:bb-bbxythos:${learnVersion}") { transitive = false }
-	providedCompile("blackboard.platform:xsscore:${learnVersion}") { transitive = false }
+
 	providedCompile "javax.servlet:javax.servlet-api:3.0.1",
 			"javax.servlet.jsp:jsp-api:2.2",
 			"taglibs:standard:1.1.2",
@@ -52,16 +46,9 @@ dependencies {
 
 	compile("blackboard.platform:bb-spring-webapi:10.5") { transitive = false }
 
-	compile "org.springframework:spring-aop:3.1.1.RELEASE",
-			"org.springframework:spring-asm:3.1.1.RELEASE",
-			"org.springframework:spring-beans:3.1.1.RELEASE",
-			"org.springframework:spring-context:3.1.1.RELEASE",
-			"org.springframework:spring-expression:3.1.1.RELEASE",
-			"org.springframework:spring-web:3.1.1.RELEASE",
+	compile "org.springframework:spring-web:3.1.1.RELEASE",
 			"org.springframework:spring-webmvc:3.1.1.RELEASE",
-			"org.springframework:spring-context-support:3.1.1.RELEASE",
 			"org.springframework:spring-core:3.1.1.RELEASE"
-
 
 	testCompile "junit:junit:4.12",
 			"commons-dbcp:commons-dbcp:1.4",
@@ -138,6 +125,5 @@ task deployB2( dependsOn: "war" ) << {
 }
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '1.6'
+	gradleVersion = '2.12'
 }
-
