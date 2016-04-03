@@ -10,7 +10,6 @@ if not exists lib (
   vagrant scp :/usr/local/blackboard/systemlib/bb-exec.jar lib
   vagrant scp :/usr/local/blackboard/systemlib/xythos/jlansrv.jar lib
   vagrant scp :/usr/local/blackboard/systemlib/xythos/xss.jar lib
-  vagrant scp :/usr/local/blackboard/systemlib/xythos/bb-bbxythos.jar lib
   vagrant scp :/usr/local/blackboard/systemlib/jdbc/ojdbc6.jar lib
 )
 

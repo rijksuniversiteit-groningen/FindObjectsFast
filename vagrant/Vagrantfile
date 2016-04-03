@@ -49,14 +49,17 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision :shell, run: "once", inline: "ulimit -n 6000"
 
-  # make some usefull symlinks in home directories
-  config.vm.provision :shell, run: "once", privileged: false, inline: "sudo -u vagrant /vagrant/scripts/conveniences.sh"
+  # make some useful symlinks in home directories
+  config.vm.provision :shell, run: "once",
+    privileged: false, inline: "sudo -u vagrant /vagrant/scripts/conveniences.sh"
 
   # remove (for testing) useless building blocks, makes startup
   # faster and saves a little memory
   # running this script is slow though, that's why it is not active by default
-  # config.vm.provision "removeb2s", run: "once", type: "shell", privileged: false, inline: "sudo -u bbuser /vagrant/scripts/remove-b2s.sh"
+  # config.vm.provision "removeb2s", run: "once", type: "shell",
+  #    privileged: false, inline: "sudo -u bbuser /vagrant/scripts/remove-b2s.sh"
 
   # restore any course archive files from shared/courses
-  config.vm.provision "courses", type: "shell", privileged: false, inline: "sudo -u bbuser /vagrant/scripts/restore-courses.sh"
+  config.vm.provision "courses", type: "shell",
+    privileged: false, inline: "sudo -u bbuser /vagrant/scripts/restore-courses.sh"
 end

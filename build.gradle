@@ -78,8 +78,8 @@ dependencies {
           "org.apache.velocity:velocity:1.7",
           "xerces:xercesImpl:2.9.1",
           "org.hibernate:hibernate-core:4.1.9.Final",
-  "blackboard.platform:xsscore:${learnVersion}"
-  "blackboard.platform:bb-bbxythos:${learnVersion}"
+          "blackboard.platform:xsscore:${learnVersion}",
+          "blackboard.platform:bb-bbxythos:${learnVersion}"
 
   // see vagrant/blackboard/copy-files.sh
   testCompile fileTree(dir: 'vagrant/blackboard/lib', include: ['*.jar'])
@@ -101,7 +101,7 @@ test {
   systemProperty "bbservices_config", "vagrant/blackboard/config/service-config-unittest.properties"
   useJUnit {
     includeCategories 'nl.rug.junit.UnitTest'
-    excludeCategories 'nl.rug.junit.IntegrationTest'
+    includeCategories 'nl.rug.junit.IntegrationTest'
   }
   reports {
     html
