@@ -131,11 +131,20 @@ task deployB2(dependsOn: "war") << {
           webappName: '/bb-starting-block-' + project.ext.deployInstance)
 }
 
+
+task revertVagrant(type: Exec) {
+  workingDir 'vagrant'
+  executable 'vagrant'
+  args 'snapshot', 'restore', 'clean-install'
+}
+
+
 task wrapper(type: Wrapper) {
   gradleVersion = '2.12'
 }
 
-task selenium(type: Test) {
+
+task selenium(type: Test, dependsOn: revertVagrant) {
   description = "Runs SeleniumHQ Tests"
   testClassesDir = sourceSets.selenium.output.classesDir
   classpath = sourceSets.selenium.runtimeClasspath
