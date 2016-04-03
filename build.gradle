@@ -32,6 +32,10 @@ configurations {
 	buildUtils
 }
 
+sourceSets {
+  selenium
+}
+
 // define the project's dependencies
 dependencies {
 	compile "com.intellij:annotations:12.0",
@@ -50,27 +54,32 @@ dependencies {
 			"org.springframework:spring-webmvc:3.1.1.RELEASE",
 			"org.springframework:spring-core:3.1.1.RELEASE"
 
-	testCompile "junit:junit:4.12",
-			"commons-dbcp:commons-dbcp:1.4",
-			"commons-lang:commons-lang:2.4",
-			"net.sf.ehcache:ehcache:2.8.2",
-			"com.esotericsoftware.kryo:kryo:2.24.0",
-			"javax.mail:mail:1.4.7",
-			"com.newrelic.agent.java:newrelic-api:3.14.0",
-			"org.slf4j:slf4j-api:1.6.3",
-			"org.slf4j:slf4j-log4j12:1.6.3",
-			"org.postgresql:postgresql:9.2-1002-jdbc4",
-			"org.apache.tomcat:tomcat-jdbc:7.0.59",
-			"org.apache.lucene:lucene-core:2.9.4",
-			"org.apache.commons:commons-lang3:3.3.2",
-			"commons-collections:commons-collections:3.2.1",
-			"org.apache.velocity:velocity:1.7",
-			"xerces:xercesImpl:2.9.1"
-			"blackboard.platform:xsscore:${learnVersion}"
-			"blackboard.platform:bb-bbxythos:${learnVersion}"
+  testCompile "junit:junit:4.12",
+		  "commons-dbcp:commons-dbcp:1.4",
+		  "commons-lang:commons-lang:2.4",
+		  "net.sf.ehcache:ehcache:2.8.2",
+		  "com.esotericsoftware.kryo:kryo:2.24.0",
+		  "javax.mail:mail:1.4.7",
+		  "com.newrelic.agent.java:newrelic-api:3.14.0",
+		  "org.slf4j:slf4j-api:1.6.3",
+		  "org.slf4j:slf4j-log4j12:1.6.3",
+		  "org.postgresql:postgresql:9.2-1002-jdbc4",
+		  "org.apache.tomcat:tomcat-jdbc:7.0.59",
+		  "org.apache.lucene:lucene-core:2.9.4",
+		  "org.apache.commons:commons-lang3:3.3.2",
+		  "commons-collections:commons-collections:3.2.1",
+		  "org.apache.velocity:velocity:1.7",
+		  "xerces:xercesImpl:2.9.1",
+		  "blackboard.platform:xsscore:${learnVersion}"
+		  "blackboard.platform:bb-bbxythos:${learnVersion}"
 
 	testCompile fileTree(dir: 'vagrant/blackboard/lib', include: ['*.jar'])
 	buildUtils "org.oscelot:b2deploy-task:0.1.0"
+
+  seleniumCompile 'junit:junit:4.12'
+  seleniumCompile 'org.seleniumhq.selenium:selenium-java:2.53.0',
+		  'org.seleniumhq.selenium:selenium-chrome-driver:2.21',
+		  'org.seleniumhq.selenium:selenium-htmlunit-driver:2.52.0'
 }
 
 
@@ -109,21 +118,45 @@ task parseBbManifest() {
 
 war.dependsOn parseBbManifest
 
-configurations {
-	buildUtils
-}
-
 // Add a task to deploy a B2 using starting block
 task deployB2( dependsOn: "war" ) << {
-	ant.taskdef( name: "b2deploy", classname: "org.oscelot.ant.B2DeployTask", classpath: project.configurations.buildUtils.asPath )
-	ant.b2deploy(
-			localfilepath: project.war.archivePath,
-			host: project.ext.deployServer,
-			courseorgavailable: 'true',
-			clean: 'true',
-			webappName: '/bb-starting-block-' + project.ext.deployInstance )
+  ant.taskdef( name: "b2deploy", classname: "org.oscelot.ant.B2DeployTask", classpath: project.configurations.buildUtils.asPath )
+  ant.b2deploy(
+		  localfilepath: project.war.archivePath,
+		  host: project.ext.deployServer,
+		  courseorgavailable: 'true',
+		  clean: 'true',
+		  webappName: '/bb-starting-block-' + project.ext.deployInstance )
 }
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '2.12'
+  gradleVersion = '2.12'
+}
+
+task selenium(type: Test) {
+  description = "Runs SeleniumHQ Tests"
+  testClassesDir = sourceSets.selenium.output.classesDir
+  classpath = sourceSets.selenium.runtimeClasspath
+  include "**/*Suite*"
+  ignoreFailures true
+}
+
+findbugs {
+  ignoreFailures = true
+  effort = "max"
+  reportLevel = "high"
+}
+
+tasks.withType(FindBugs) {
+  reports {
+	xml.enabled = false
+	html.enabled = true
+  }
+}
+
+
+idea {
+  module {
+	scopes.TEST.plus += [ configurations.seleniumCompile ]
+  }
 }
