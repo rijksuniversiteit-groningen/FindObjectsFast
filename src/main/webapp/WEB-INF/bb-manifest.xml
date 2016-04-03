@@ -3,28 +3,27 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://www.blackboard.com/bb-manifest-plugin http://fibbba.medu.com/xsd/bb-manifest-plugin.xsd">
   <plugin>
+    <name value="Find Objects Fast"/>
+    <handle value="FindObjectsFast"/>
+    <description value="Find Objects Fast"/>
+    <default-locale value="en_US"/>
 
-
-    <name value="Find Objects Fast" />
-    <handle value="FindObjectsFast" />
-    <description value="Find Objects Fast" />
-    <default-locale value="en_US" />
-
-    <version value="1.0" />
+    <version value="1.0"/>
     <requires>
-      <bbversion value="9.1.130000.0" />
+      <bbversion value="9.1.130000.0"/>
     </requires>
 
     <vendor>
-      <id value="UG" />
-      <name value="University of Groningen" />
-      <url value="http://rug.nl/" />
-      <description value="University of Groningen" />
+      <id value="UG"/>
+      <name value="University of Groningen"/>
+      <url value="http://rug.nl/"/>
+      <description value="University of Groningen"/>
     </vendor>
 
+
     <module-defs>
-      <module-type ext-ref="ug/FindObjectsFast/FindObjectsFastModule"  title="Finds Objects Fast"
-                   uicreatable="true" >
+      <module-type ext-ref="ug/FindObjectsFast/FindObjectsFastModule" title="Finds Objects Fast"
+                   uicreatable="true">
         <jsp>
           <view>/viewModule</view>
         </jsp>
@@ -35,18 +34,22 @@
               useraddable="true"
               isdetachable="true"
               isdeletable="true"
-              isasync="false"
-              >
+              isasync="false">
         <description>Utility Module to find objects for System Administrators</description>
         <module-groups>
           <module-group id="Everyone"/>
         </module-groups>
         <ExtraInfo/>
       </module>
-
     </module-defs>
 
 
+    <!--
+      way more permissions than are necessary for this building block
+      it's just that finding the right permissions is such a painful
+      trail and error (esp. since Learn 2014.4) that we just copy/paste
+      from previous building blocks
+      -->
     <permissions>
       <permission type="attribute" name="user.authinfo" actions="get,set"/>
       <permission type="attribute" name="user.personalinfo" actions="get,set"/>
@@ -67,7 +70,7 @@
       <!-- prevent warnings when a building block starts (2014.10 problem) -->
       <permission type="java.util.PropertyPermission"
                   name="org.apache.juli.ClassLoaderLogManager.debug"
-                  action="read"/>
+                  actions="read"/>
 
       <!-- tab and layoutfamily permissions are required when dealing with groups -->
       <permission type="persist" name="tab" actions="persist, read, create, modify, delete"/>
@@ -117,7 +120,6 @@
       <!-- sometimes(?!) needed to initialize the database ConnectionPool -->
       <!-- also needed when using Apache Axis (webservices) -->
       <permission type="runtime" name="getClassLoader" actions=""/>
-
     </permissions>
 
   </plugin>
