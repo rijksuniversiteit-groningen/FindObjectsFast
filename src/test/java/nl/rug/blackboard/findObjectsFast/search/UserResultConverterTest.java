@@ -32,6 +32,14 @@ public class UserResultConverterTest {
 		UserResultConverter userResultConverter = new UserResultConverter();
 		UserResult result = userResultConverter.apply(u);
 		assertNotNull(result);
+
+		/*
+		 * if this fails with "expected:<[Bart Simpson]> but was:<[LOCALE_SETTINGS.SHORT]>"
+		 * then either
+		 *  1. you did not copy the locale files from the Vagrant image
+		 *  2. you did not change bbconfig.base.shared.dir in bb-config.properties
+		 *  3. your computer selects a locale that was not copied
+		 */
 		assertEquals("Bart Simpson", result.getDisplayName());
 	}
 }

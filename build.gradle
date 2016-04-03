@@ -33,6 +33,12 @@ configurations {
 
 sourceSets {
   selenium
+  test {
+    resources {
+      // this is where we'll put the required xythos.properties
+      srcDir "vagrant/blackboard"
+    }
+  }
 }
 
 // define the project's dependencies
@@ -53,6 +59,8 @@ dependencies {
           "org.springframework:spring-webmvc:3.1.1.RELEASE",
           "org.springframework:spring-core:3.1.1.RELEASE"
 
+  // trial and error resulted in the following dependencies
+  // for integration tests
   testCompile "junit:junit:4.12",
           "commons-dbcp:commons-dbcp:1.4",
           "commons-lang:commons-lang:2.4",
@@ -69,10 +77,13 @@ dependencies {
           "commons-collections:commons-collections:3.2.1",
           "org.apache.velocity:velocity:1.7",
           "xerces:xercesImpl:2.9.1",
-          "blackboard.platform:xsscore:${learnVersion}"
+          "org.hibernate:hibernate-core:4.1.9.Final",
+  "blackboard.platform:xsscore:${learnVersion}"
   "blackboard.platform:bb-bbxythos:${learnVersion}"
 
+  // see vagrant/blackboard/copy-files.sh
   testCompile fileTree(dir: 'vagrant/blackboard/lib', include: ['*.jar'])
+
   buildUtils "org.oscelot:b2deploy-task:0.1.0"
 
   seleniumCompile 'junit:junit:4.12'
