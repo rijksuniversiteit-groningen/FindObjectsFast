@@ -1,0 +1,41 @@
+apply plugin: "idea"
+
+sourceSets {
+  selenium
+}
+
+dependencies {
+  seleniumCompile 'junit:junit:4.12'
+
+  // you'll also need to add chromedriver to your PATH
+  // https://sites.google.com/a/chromium.org/chromedriver/downloads
+  seleniumCompile 'org.seleniumhq.selenium:selenium-java:2.53.0',
+          'org.seleniumhq.selenium:selenium-chrome-driver:2.53.0',
+          'org.seleniumhq.selenium:selenium-htmlunit-driver:2.52.0'
+}
+
+task revertVagrant(type: Exec) {
+  workingDir 'vagrant'
+  executable 'vagrant'
+  args 'snapshot', 'restore', 'clean-install'
+}
+
+revertVagrant.doLast {
+  println("waiting for Blackboard to start...")
+  sleep (60000)
+}
+
+task selenium(type: Test, dependsOn: revertVagrant) {
+  description = "Runs SeleniumHQ Tests"
+  testClassesDir = sourceSets.selenium.output.classesDir
+  classpath = sourceSets.selenium.runtimeClasspath
+  include "**/*Suite*"
+  ignoreFailures true
+}
+
+// this lets IntelliJ know the selenium classes
+idea {
+  module {
+    scopes.TEST.plus += [configurations.seleniumCompile]
+  }
+}

@@ -1,0 +1,31 @@
+// Set defaults if gradle.properties file was not present
+// To override copy gradle.properties.template to gradle.properties
+if (!project.hasProperty("learnVersion")) {
+  ext.learnVersion = "9.1.201510.1171621"
+}
+if (!project.hasProperty('deployServer')) {
+  ext.deployServer = "localhost:3380"
+}
+if (!project.hasProperty('deployInstance')) {
+  ext.deployInstance = "BBLEARN"
+}
+
+configurations {
+  buildUtils
+}
+
+dependencies {
+  buildUtils "org.oscelot:b2deploy-task:0.1.0"
+}
+
+// Add a task to deploy a B2 using starting block
+task deployB2(dependsOn: "war") << {
+  ant.taskdef(name: "b2deploy", classname: "org.oscelot.ant.B2DeployTask", classpath: project.configurations.buildUtils.asPath)
+  ant.b2deploy(
+          localfilepath: project.war.archivePath,
+          host: project.ext.deployServer,
+          courseorgavailable: 'true',
+          clean: 'true',
+          webappName: '/bb-starting-block-' + project.ext.deployInstance)
+}
+

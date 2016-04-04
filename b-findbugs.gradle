@@ -1,0 +1,15 @@
+apply plugin: "findbugs"
+
+findbugs {
+  ignoreFailures = true
+  effort = "max"
+  reportLevel = "high"
+}
+
+tasks.withType(FindBugs) {
+  reports {
+    xml.enabled = false
+    html.enabled = true
+  }
+}
+

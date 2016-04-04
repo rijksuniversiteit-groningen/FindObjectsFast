@@ -1,23 +1,14 @@
 apply plugin: "java"
-apply plugin: "idea"
 apply plugin: "war"
 apply plugin: "maven"
-apply plugin: "findbugs"
+
+apply from: "b-deploy.gradle"
+apply from: "b-findbugs.gradle"
+apply from: "b-test.gradle"
+apply from: "b-selenium.gradle"
 
 // Learn upto (including) 2015.10 requires compilation with Java 7
 sourceCompatibility = 1.7
-
-// Set defaults if gradle.properties file was not present
-// To override copy gradle.properties.template to gradle.properties
-if (!project.hasProperty("learnVersion")) {
-  ext.learnVersion = "9.1.201510.1171621"
-}
-if (!project.hasProperty('deployServer')) {
-  ext.deployServer = "localhost:3380"
-}
-if (!project.hasProperty('deployInstance')) {
-  ext.deployInstance = "BBLEARN"
-}
 
 
 repositories {
@@ -27,19 +18,7 @@ repositories {
   }
 }
 
-configurations {
-  buildUtils
-}
 
-sourceSets {
-  selenium
-  test {
-    resources {
-      // this is where we'll put the required xythos.properties
-      srcDir "vagrant/blackboard"
-    }
-  }
-}
 
 // define the project's dependencies
 dependencies {
@@ -58,61 +37,6 @@ dependencies {
   compile "org.springframework:spring-web:3.1.1.RELEASE",
           "org.springframework:spring-webmvc:3.1.1.RELEASE",
           "org.springframework:spring-core:3.1.1.RELEASE"
-
-  // trial and error resulted in the following dependencies
-  // for integration tests
-  testCompile "junit:junit:4.12",
-          "commons-dbcp:commons-dbcp:1.4",
-          "commons-lang:commons-lang:2.4",
-          "net.sf.ehcache:ehcache:2.8.2",
-          "com.esotericsoftware.kryo:kryo:2.24.0",
-          "javax.mail:mail:1.4.7",
-          "com.newrelic.agent.java:newrelic-api:3.14.0",
-          "org.slf4j:slf4j-api:1.6.3",
-          "org.slf4j:slf4j-log4j12:1.6.3",
-          "org.postgresql:postgresql:9.2-1002-jdbc4",
-          "org.apache.tomcat:tomcat-jdbc:7.0.59",
-          "org.apache.lucene:lucene-core:2.9.4",
-          "org.apache.commons:commons-lang3:3.3.2",
-          "commons-collections:commons-collections:3.2.1",
-          "org.apache.velocity:velocity:1.7",
-          "xerces:xercesImpl:2.9.1",
-          "org.hibernate:hibernate-core:4.1.9.Final",
-          "blackboard.platform:xsscore:${learnVersion}",
-          "blackboard.platform:bb-bbxythos:${learnVersion}"
-
-  // see vagrant/blackboard/copy-files.sh
-  testCompile fileTree(dir: 'vagrant/blackboard/lib', include: ['*.jar'])
-
-  buildUtils "org.oscelot:b2deploy-task:0.1.0"
-
-  seleniumCompile 'junit:junit:4.12'
-
-  // you'll also need to add chromedriver to your PATH
-  // https://sites.google.com/a/chromium.org/chromedriver/downloads
-  seleniumCompile 'org.seleniumhq.selenium:selenium-java:2.53.0',
-          'org.seleniumhq.selenium:selenium-chrome-driver:2.53.0',
-          'org.seleniumhq.selenium:selenium-htmlunit-driver:2.52.0'
-}
-
-
-test {
-  ignoreFailures true
-  systemProperty "bbservices_config", "vagrant/blackboard/config/service-config-unittest.properties"
-  useJUnit {
-    includeCategories 'nl.rug.junit.UnitTest'
-    includeCategories 'nl.rug.junit.IntegrationTest'
-  }
-  reports {
-    html
-  }
-}
-
-
-getProperties().each { k, v ->
-  if (k.startsWith('junitProp.')) {
-    test.systemProperty "${k.split('\\.')[1]}", "${v}"
-  }
 }
 
 
@@ -131,54 +55,8 @@ task parseBbManifest() {
 
 war.dependsOn parseBbManifest
 
-// Add a task to deploy a B2 using starting block
-task deployB2(dependsOn: "war") << {
-  ant.taskdef(name: "b2deploy", classname: "org.oscelot.ant.B2DeployTask", classpath: project.configurations.buildUtils.asPath)
-  ant.b2deploy(
-          localfilepath: project.war.archivePath,
-          host: project.ext.deployServer,
-          courseorgavailable: 'true',
-          clean: 'true',
-          webappName: '/bb-starting-block-' + project.ext.deployInstance)
-}
-
-
-task revertVagrant(type: Exec) {
-  workingDir 'vagrant'
-  executable 'vagrant'
-  args 'snapshot', 'restore', 'clean-install'
-}
-
 
 task wrapper(type: Wrapper) {
   gradleVersion = '2.12'
 }
 
-
-task selenium(type: Test, dependsOn: revertVagrant) {
-  description = "Runs SeleniumHQ Tests"
-  testClassesDir = sourceSets.selenium.output.classesDir
-  classpath = sourceSets.selenium.runtimeClasspath
-  include "**/*Suite*"
-  ignoreFailures true
-}
-
-findbugs {
-  ignoreFailures = true
-  effort = "max"
-  reportLevel = "high"
-}
-
-tasks.withType(FindBugs) {
-  reports {
-    xml.enabled = false
-    html.enabled = true
-  }
-}
-
-
-idea {
-  module {
-    scopes.TEST.plus += [configurations.seleniumCompile]
-  }
-}
