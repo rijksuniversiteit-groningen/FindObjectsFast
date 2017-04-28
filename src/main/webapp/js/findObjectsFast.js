@@ -128,7 +128,7 @@ function FindObjectsFast() {
     function renderCourse(result) {
         var link = a({'href': result.url}, text(result.title));
         var item = li({'title': result.code}, [
-            span({'class': result.course ? 'icon-puzzle-piece' : 'icon-group', title: 'Course'}),
+            span({'class': result.course ? 'icon icon-puzzle-piece' : 'icon-group', title: 'Course'}),
             text(' '),
             renderCourseCode(result.code),
             link]);
@@ -143,14 +143,16 @@ function FindObjectsFast() {
         var emailPart = result.email ? ' (' + result.email + ')' : '';
         var link = a({'href': result.url}, text(result.displayName));
         var item = li({'title': result.username}, [
-            span({'class': 'icon-user', title: 'instructor'}),
+            span({'class': 'icon icon-user', title: 'instructor'}),
             text(' '),
             renderCourseCode(result.username + emailPart),
             link,
             text(' | '),
             a({href: result.courseEnrollmentsUrl}, text('Courses')),
             text(' | '),
-            a({href: result.organizationEnrollmentsUrl}, text('Organizations'))]);
+            a({href: result.organizationEnrollmentsUrl}, text('Organizations')),
+            text(' | '),
+            a({href: result.editPasswordUrl}, text('Password'))]);
 
         if (!result.available) {
             link.className = 'fof_unavailable';

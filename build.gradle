@@ -35,8 +35,12 @@ dependencies {
   compile("blackboard.platform:bb-spring-webapi:10.5") { transitive = false }
 
   compile "org.springframework:spring-web:3.1.1.RELEASE",
-          "org.springframework:spring-webmvc:3.1.1.RELEASE",
-          "org.springframework:spring-core:3.1.1.RELEASE"
+      "org.springframework:spring-webmvc:3.1.1.RELEASE",
+      "org.springframework:spring-core:3.1.1.RELEASE"
+
+
+  compile group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.9.10'
+
 }
 
 

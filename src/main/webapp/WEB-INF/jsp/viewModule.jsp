@@ -14,8 +14,7 @@
            name="searchTerm"
            id="fof_searchTerm"
            autocomplete="off"
-           placeholder="Type to search users, courses and organizations"
-    />
+           placeholder="Type to search users, courses and organizations"/>
 
     <div id="fof_searchResults"></div>
 

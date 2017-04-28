@@ -7,6 +7,7 @@ public class UserResult {
     private String url;
     private String courseEnrollmentsUrl;
     private String organizationEnrollmentsUrl;
+    private String editPasswordUrl;
     private boolean available;
 
     public String getUsername() {
@@ -56,6 +57,17 @@ public class UserResult {
     public void setOrganizationEnrollmentsUrl(String organizationEnrollmentsUrl) {
         this.organizationEnrollmentsUrl = organizationEnrollmentsUrl;
     }
+
+
+    public String getEditPasswordUrl() {
+        return editPasswordUrl;
+    }
+
+
+    public void setEditPasswordUrl(String editPasswordUrl) {
+        this.editPasswordUrl = editPasswordUrl;
+    }
+
 
     public boolean isAvailable() {
         return available;

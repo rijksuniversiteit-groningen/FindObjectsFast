@@ -20,6 +20,7 @@ public class UserResultConverter implements Function<User, UserResult> {
 		result.setUrl(launchHandler.getLaunchUrl());
 		result.setCourseEnrollmentsUrl(getUserCourseEnrollmentsUrl(user));
 		result.setOrganizationEnrollmentsUrl(getUserOrganizationEnrollmentsUrl(user));
+		result.setEditPasswordUrl(getEditPasswordUrl(user));
 		result.setAvailable(user.getIsAvailable());
 		return result;
 	}
@@ -31,6 +32,11 @@ public class UserResultConverter implements Function<User, UserResult> {
 
 	private String getUserOrganizationEnrollmentsUrl(User user) {
 		return "/webapps/blackboard/execute/userEnrollment?nav_item=list_orgs_by_user&group_type=Organization&user_id="
+				+ user.getId().toExternalString();
+	}
+
+	private String getEditPasswordUrl(User user) {
+		return "/webapps/blackboard/execute/changePassword?user_id="
 				+ user.getId().toExternalString();
 	}
 }
